@@ -467,18 +467,22 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
     private fun enablePictureInPicture(player: BetterPlayer) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d(TAG, "enablePictureInPicture: Entering manual PiP mode")
             player.setupMediaSession(flutterState!!.applicationContext)
             manualPipPlayer = player
             activity!!.enterPictureInPictureMode(PictureInPictureParams.Builder().setAspectRatio(
                 Rational(16, 9)
             ).build())
             // Don't call onPictureInPictureStatusChanged here - let the system callback handle it
+            Log.d(TAG, "enablePictureInPicture: PiP mode entered, waiting for system callback")
         }
     }
 
     private fun disablePictureInPicture(player: BetterPlayer) {
+        Log.d(TAG, "disablePictureInPicture: Manually disabling PiP")
         if (manualPipPlayer == player) {
             manualPipPlayer = null
+            Log.d(TAG, "disablePictureInPicture: Cleared manual PiP player reference")
         }
         activity!!.moveTaskToBack(false)
         player.onPictureInPictureStatusChanged(false)
@@ -554,9 +558,11 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         
         @JvmStatic
         fun onPictureInPictureModeChanged(isInPipMode: Boolean) {
+            Log.d(TAG, "onPictureInPictureModeChanged: isInPipMode=$isInPipMode, hasAutomaticPlayer=${instance?.automaticPipPlayer != null}, hasManualPlayer=${instance?.manualPipPlayer != null}")
             instance?.automaticPipPlayer?.onPictureInPictureStatusChanged(isInPipMode)
             instance?.manualPipPlayer?.onPictureInPictureStatusChanged(isInPipMode)
             if (!isInPipMode) {
+                Log.d(TAG, "Exiting PiP mode - clearing manual PiP player reference")
                 instance?.manualPipPlayer = null
             }
         }
