@@ -563,6 +563,21 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _videoPlayerPlatform.disablePictureInPicture(textureId);
   }
 
+  ///Enable/disable automatic Picture in Picture mode when app goes to background.
+  ///On Android 12+, this uses setAutoEnterEnabled.
+  Future<void> setAutomaticPictureInPictureEnabled(bool enabled) async {
+    await _videoPlayerPlatform.setAutomaticPictureInPictureEnabled(textureId, enabled);
+  }
+
+  ///Check if automatic Picture in Picture mode is supported on this device.
+  ///Returns true on Android 12+ (API 31) and iOS 14.2+.
+  Future<bool?> isAutomaticPictureInPictureSupported() async {
+    if (_textureId == null) {
+      return false;
+    }
+    return _videoPlayerPlatform.isAutomaticPictureInPictureSupported(_textureId);
+  }
+
   void _updatePosition(Duration? position, {DateTime? absolutePosition}) {
     value = value.copyWith(position: _seekPosition ?? position);
     if (_seekPosition == null) {

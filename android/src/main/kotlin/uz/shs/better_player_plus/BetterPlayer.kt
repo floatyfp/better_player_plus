@@ -528,10 +528,16 @@ internal class BetterPlayer(
 
     fun play() {
         exoPlayer?.playWhenReady = true
+        BetterPlayerPlugin.updatePictureInPictureParams()
     }
 
     fun pause() {
         exoPlayer?.playWhenReady = false
+        BetterPlayerPlugin.updatePictureInPictureParams()
+    }
+
+    fun isPlaying(): Boolean {
+        return exoPlayer?.isPlaying == true
     }
 
     fun setLooping(value: Boolean) {

@@ -479,6 +479,49 @@ public class BetterPlayer: NSObject, FlutterPlatformView, FlutterStreamHandler, 
         }
     }
 
+    ///Enable or disable automatic Picture in Picture mode when app goes to background.
+    public func setAutomaticPictureInPictureEnabled(_ enabled: Bool) {
+        if #available(iOS 14.2, *) {
+            if pipController == nil {
+                setupPipControllerForAutomaticPip()
+            }
+            pipController?.canStartPictureInPictureAutomaticallyFromInline = enabled
+        }
+    }
+
+    private func setupPipControllerForAutomaticPip() {
+        if #available(iOS 9.0, *) {
+            try? AVAudioSession.sharedInstance().setActive(true)
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+            UIApplication.shared.beginReceivingRemoteControlEvents()
+            if AVPictureInPictureController.isPictureInPictureSupported() {
+                let layer = AVPlayerLayer(player: player)
+                if #available(iOS 13.0, *) {
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first,
+                       let rootVC = window.rootViewController {
+                        layer.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+                        layer.needsDisplayOnBoundsChange = true
+                        rootVC.view.layer.addSublayer(layer)
+                        playerLayerRef = layer
+                    }
+                } else {
+                    if let window = UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first,
+                       let rootVC = window.rootViewController {
+                        layer.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+                        layer.needsDisplayOnBoundsChange = true
+                        rootVC.view.layer.addSublayer(layer)
+                        playerLayerRef = layer
+                    }
+                }
+                if let playerLayer = playerLayerRef {
+                    pipController = AVPictureInPictureController(playerLayer: playerLayer)
+                    pipController?.delegate = self
+                }
+            }
+        }
+    }
+
     public func enablePictureInPicture(_ frame: CGRect) {
         disablePictureInPicture()
         usePlayerLayer(frame)

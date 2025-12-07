@@ -300,6 +300,15 @@ extension SwiftBetterPlayerPlugin {
             result(NSNumber(value: false))
         case "disablePictureInPicture":
             player.disablePictureInPicture(); player.setPictureInPicture(false); result(nil)
+        case "setAutomaticPictureInPictureEnabled":
+            let enabled = (argsMap["enabled"] as? NSNumber)?.boolValue ?? false
+            player.setAutomaticPictureInPictureEnabled(enabled)
+            result(nil)
+        case "isAutomaticPictureInPictureSupported":
+            if #available(iOS 14.2, *), AVPictureInPictureController.isPictureInPictureSupported() {
+                result(NSNumber(value: true)); return
+            }
+            result(NSNumber(value: false))
         case "setAudioTrack":
             let name = argsMap["name"] as? String ?? ""
             let index = (argsMap["index"] as? NSNumber)?.intValue ?? 0

@@ -508,6 +508,11 @@ class BetterPlayerController {
 
     _videoEventStreamSubscription = videoPlayerController?.videoEventStreamController.stream.listen(_handleVideoEvent);
 
+    ///Setup automatic Picture in Picture if configured
+    if (betterPlayerConfiguration.automaticallyEnterPictureInPicture) {
+      unawaited(setAutomaticPictureInPictureEnabled(true));
+    }
+
     final fullScreenByDefault = betterPlayerConfiguration.fullScreenByDefault;
     if (betterPlayerConfiguration.autoPlay) {
       if (fullScreenByDefault && !isFullScreen) {
@@ -735,9 +740,18 @@ class BetterPlayerController {
       _hasCurrentDataSourceInitialized = true;
       _postEvent(BetterPlayerEvent(BetterPlayerEventType.initialized));
     }
-    if (currentVideoPlayerValue.isPip) {
+
+    if (currentVideoPlayerValue.isPip && !_wasInPipMode) {
       _wasInPipMode = true;
-    } else if (_wasInPipMode) {
+      // For Android automatic PiP, enter fullscreen to show player-only UI
+      if (Platform.isAndroid && !_isFullScreen) {
+        _wasInFullScreenBeforePiP = false;
+        _wasControlsEnabledBeforePiP = _controlsEnabled;
+        setControlsEnabled(false);
+        enterFullScreen();
+      }
+      _postEvent(BetterPlayerEvent(BetterPlayerEventType.pipStart));
+    } else if (!currentVideoPlayerValue.isPip && _wasInPipMode) {
       _postEvent(BetterPlayerEvent(BetterPlayerEventType.pipStop));
       _wasInPipMode = false;
       if (!_wasInFullScreenBeforePiP) {
@@ -1047,6 +1061,27 @@ class BetterPlayerController {
       throw StateError('The data source has not been initialized');
     }
     return videoPlayerController!.disablePictureInPicture();
+  }
+
+  ///Enable or disable automatic Picture in Picture mode. When enabled, the player
+  ///will automatically enter PiP mode when the app goes to background (on Android 12+
+  ///this uses setAutoEnterEnabled). On iOS, this enables automatic PiP when the
+  ///app enters background while playing.
+  ///Use [isAutomaticPictureInPictureSupported] to check if this feature is available.
+  Future<void> setAutomaticPictureInPictureEnabled(bool enabled) async {
+    if (videoPlayerController == null) {
+      throw StateError('The data source has not been initialized');
+    }
+    await videoPlayerController!.setAutomaticPictureInPictureEnabled(enabled);
+  }
+
+  ///Check if automatic Picture in Picture mode is supported on this device.
+  ///Returns true on Android 12+ (API 31) and iOS 14.2+.
+  Future<bool> isAutomaticPictureInPictureSupported() async {
+    if (videoPlayerController == null) {
+      throw StateError('The data source has not been initialized');
+    }
+    return (await videoPlayerController!.isAutomaticPictureInPictureSupported()) ?? false;
   }
 
   // ignore: use_setters_to_change_properties

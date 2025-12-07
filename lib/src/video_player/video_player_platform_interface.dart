@@ -149,6 +149,18 @@ abstract class VideoPlayerPlatform {
     throw UnimplementedError('isPictureInPictureEnabled() has not been implemented.');
   }
 
+  ///Enables/disables automatic PiP mode when app goes to background.
+  ///On Android 12+, this uses setAutoEnterEnabled.
+  Future<void> setAutomaticPictureInPictureEnabled(int? textureId, bool enabled) {
+    throw UnimplementedError('setAutomaticPictureInPictureEnabled() has not been implemented.');
+  }
+
+  ///Checks if automatic PiP mode is supported on this device.
+  ///Returns true on Android 12+ (API 31) and iOS 14.2+.
+  Future<bool?> isAutomaticPictureInPictureSupported(int? textureId) {
+    throw UnimplementedError('isAutomaticPictureInPictureSupported() has not been implemented.');
+  }
+
   Future<void> setAudioTrack(int? textureId, String? name, int? index) {
     throw UnimplementedError('setAudio() has not been implemented.');
   }

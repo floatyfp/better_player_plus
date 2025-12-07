@@ -41,6 +41,7 @@ class BetterPlayerConfiguration {
     this.autoDispose = true,
     this.expandToFill = true,
     this.useRootNavigator = false,
+    this.automaticallyEnterPictureInPicture = false,
   });
 
   /// Play the video as soon as it's displayed
@@ -154,6 +155,12 @@ class BetterPlayerConfiguration {
   ///Default value is false.
   final bool useRootNavigator;
 
+  ///Flag which enables/disables automatic Picture in Picture mode when the app
+  ///goes to background. On Android 12+, this uses setAutoEnterEnabled. On iOS,
+  ///this enables automatic PiP when the app enters background while playing.
+  ///Default value is false.
+  final bool automaticallyEnterPictureInPicture;
+
   BetterPlayerConfiguration copyWith({
     double? aspectRatio,
     bool? autoPlay,
@@ -184,6 +191,7 @@ class BetterPlayerConfiguration {
     bool? autoDispose,
     bool? expandToFill,
     bool? useRootNavigator,
+    bool? automaticallyEnterPictureInPicture,
   }) => BetterPlayerConfiguration(
     aspectRatio: aspectRatio ?? this.aspectRatio,
     autoPlay: autoPlay ?? this.autoPlay,
@@ -214,5 +222,6 @@ class BetterPlayerConfiguration {
     autoDispose: autoDispose ?? this.autoDispose,
     expandToFill: expandToFill ?? this.expandToFill,
     useRootNavigator: useRootNavigator ?? this.useRootNavigator,
+    automaticallyEnterPictureInPicture: automaticallyEnterPictureInPicture ?? this.automaticallyEnterPictureInPicture,
   );
 }
