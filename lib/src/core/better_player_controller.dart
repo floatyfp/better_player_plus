@@ -156,6 +156,9 @@ class BetterPlayerController {
   ///Was Picture in Picture opened.
   bool _wasInPipMode = false;
 
+  ///Stream controller to notify listeners when PiP was exited.
+  final StreamController<bool> _pipExitController = StreamController<bool>.broadcast();
+
   ///Was player in fullscreen before Picture in Picture opened.
   bool _wasInFullScreenBeforePiP = false;
 
@@ -761,6 +764,10 @@ class BetterPlayerController {
         setControlsEnabled(true);
       }
       videoPlayerController?.refresh();
+      // Notify listeners that PiP was exited
+      try {
+        _pipExitController.add(true);
+      } catch (_) {}
     }
 
     if (_betterPlayerSubtitlesSource?.asmsIsSegmented ?? false) {
@@ -1090,6 +1097,10 @@ class BetterPlayerController {
     _betterPlayerGlobalKey = betterPlayerGlobalKey;
   }
 
+  ///Stream which emits when PiP was exited. UI can subscribe to pop the
+  ///overlay pushed on PiP enter.
+  Stream<bool> get pipExitStream => _pipExitController.stream;
+
   ///Check if picture in picture mode is supported in this device.
   Future<bool> isPictureInPictureSupported() async {
     if (videoPlayerController == null) {
@@ -1256,6 +1267,8 @@ class BetterPlayerController {
       _controlsVisibilityStreamController.close();
       _videoEventStreamSubscription?.cancel();
       _disposed = true;
+      // Close PiP exit stream controller
+      _pipExitController.close();
       _controllerEventStreamController.close();
 
       ///Delete files async

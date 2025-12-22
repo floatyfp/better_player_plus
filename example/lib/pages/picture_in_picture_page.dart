@@ -27,10 +27,9 @@ class _PictureInPicturePageState extends State<PictureInPicturePage> {
       Constants.elephantDreamVideoUrl,
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
-    _betterPlayerController.setupDataSource(dataSource).then((_) {
-      _checkPipSupport();
-    });
+    _betterPlayerController.setupDataSource(dataSource);
     _betterPlayerController.setBetterPlayerGlobalKey(_betterPlayerKey);
+    _checkPipSupport();
     super.initState();
   }
 
