@@ -180,8 +180,10 @@ class _BetterPlayerState extends State<BetterPlayer> with WidgetsBindingObserver
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
     final TransitionRoute<void> route = PageRouteBuilder<void>(
-      settings: const RouteSettings(),
+      barrierColor: Colors.black,
       pageBuilder: _fullScreenRoutePageBuilder,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
     );
 
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
